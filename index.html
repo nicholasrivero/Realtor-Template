@@ -5,19 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Realtor Template — Neutral & Modern</title>
 
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-G669SZ7J74"></script>
-  <script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-G669SZ7J74"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-G669SZ7J74');
+  </script>
 
-  gtag('config', 'G-G669SZ7J74');
-</script>
     <!-- Client config (ignored by git). Copy config-sample.js -> config.js and fill in details -->
-  <script src="config.js"></script>
+    <script src="config.js"></script>
 
-  <!-- Leaflet (map) -->
+    <!-- Leaflet (map) -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="anonymous"/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"></script>
 
@@ -25,7 +25,14 @@
     :root{
       --bg:#f8f5f0; --ink:#2b2a27; --muted:#6e685f; --head:#eae3d7; --accent:#d6c7b0;
       --radius:16px; --header-h:96px;
+      --surface:#ffffff; --border:#e1dbd1; --focus:#b6aa96;
     }
+    /* Dark theme */
+    [data-theme="dark"]{
+      --bg:#0f1115; --ink:#e9e9e9; --muted:#a3a3a3; --head:#141821; --accent:#6b8fcf;
+      --surface:#161a22; --border:#2a3140; --focus:#4f6fb3;
+    }
+
     *{box-sizing:border-box}
     html{scroll-behavior:smooth}
     body{margin:0;font-family:Inter,system-ui,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6}
@@ -46,8 +53,8 @@
 
     .nav-toggle{
       display:inline-flex; align-items:center; justify-content:center;
-      appearance:none; border:0; background:transparent; cursor:pointer;
-      width:44px; height:44px; border-radius:8px; position:relative; z-index:3600;
+      appearance:none; border:1px solid var(--border); background:var(--surface); color:var(--ink);
+      cursor:pointer; width:44px; height:44px; border-radius:8px; position:relative; z-index:3600;
     }
     .nav-toggle .bar{ display:block; width:24px; height:2px; background:var(--ink); margin:5px auto; transition:transform .2s, opacity .2s; }
 
@@ -56,7 +63,7 @@
       position:fixed; inset:0 0 0 auto;
       width:min(78vw, 320px); height:100vh; padding:100px 18px 18px;
       display:flex; flex-direction:column; gap:14px;
-      background:#fff; box-shadow:-24px 0 40px rgba(0,0,0,.12);
+      background:var(--surface); box-shadow:-24px 0 40px rgba(0,0,0,.12);
       transform:translateX(100%); transition:transform .25s ease;
       z-index:3500; will-change: transform;
     }
@@ -78,12 +85,13 @@
     .section{margin-top:2rem; scroll-margin-top:calc(var(--header-h) + 12px);}
     main{max-width:1120px;margin:auto;padding:0 1rem 2rem}
     .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.25rem}
-    .card{display:flex;flex-direction:column;border-radius:var(--radius);overflow:hidden;background:#fff;box-shadow:0 8px 28px rgba(0,0,0,.08)}
+    .card{display:flex;flex-direction:column;border-radius:var(--radius);overflow:hidden;background:var(--surface);box-shadow:0 8px 28px rgba(0,0,0,.08)}
     .card .media{background:#efe8dc;display:block;overflow:hidden}
+    [data-theme="dark"] .card .media{background:#1d2330}
     .card .media img{width:100%;aspect-ratio:16/9;height:auto;object-fit:cover;display:block}
     .card .body{padding:1rem;display:grid;gap:.4rem}
     .muted{color:var(--muted)}
-    .btn{display:inline-flex;align-items:center;justify-content:center;padding:.6rem 1rem;border-radius:10px;border:1px solid #e1dbd1;background:#fff;cursor:pointer}
+    .btn{display:inline-flex;align-items:center;justify-content:center;padding:.6rem 1rem;border-radius:10px;border:1px solid var(--border);background:var(--surface);cursor:pointer;color:var(--ink)}
     .btn.primary{background:var(--accent);border-color:transparent;color:#fff}
 
     /* ===== Slider frame uses accent color ===== */
@@ -106,10 +114,10 @@
     .ctrl{pointer-events:auto;border:1px solid rgba(255,255,255,.6);background:rgba(0,0,0,.45);color:#fff;width:44px;height:44px;border-radius:999px;display:grid;place-items:center;font-size:1.2rem;cursor:pointer}
 
     /* ===== Map + Schools ===== */
-    #mapWrap{border-radius:var(--radius);overflow:hidden;background:#fff;box-shadow:0 8px 28px rgba(0,0,0,.08);position:relative;z-index:0}
+    #mapWrap{border-radius:var(--radius);overflow:hidden;background:var(--surface);box-shadow:0 8px 28px rgba(0,0,0,.08);position:relative;z-index:0}
     #map{width:100%;height:420px}
     .schools{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem}
-    .school{background:#fff;border-radius:var(--radius);padding:1rem;box-shadow:0 8px 28px rgba(0,0,0,.06)}
+    .school{background:var(--surface);border-radius:var(--radius);padding:1rem;box-shadow:0 8px 28px rgba(0,0,0,.06)}
     .school small{color:var(--muted)}
 
     /* ===== Contact polish ===== */
@@ -119,25 +127,36 @@
     @media (max-width:680px){ form .row{grid-template-columns:1fr} }
     form label{display:block;font-weight:600;margin:.25rem 0}
     form input, form textarea{
-      width:100%;padding:.8rem 1rem;border:1px solid #e1dbd1;border-radius:10px;background:#fff;font:inherit;transition:border-color .2s, box-shadow .2s
+      width:100%;padding:.8rem 1rem;border:1px solid var(--border);border-radius:10px;background:var(--surface);color:var(--ink);font:inherit;transition:border-color .2s, box-shadow .2s
     }
     form input:focus, form textarea:focus{
-      outline:none;border-color:#b6aa96;box-shadow:0 0 0 3px rgba(182,170,150,.25)
+      outline:none;border-color:var(--focus);box-shadow:0 0 0 3px color-mix(in oklab, var(--focus) 25%, transparent)
     }
     form textarea{min-height:140px;resize:vertical}
     /* Subject as auto-expanding textarea (ChatGPT-style) */
     #subject{
-      font-size:1rem;
-      padding:.8rem 1rem;
-      min-width:100%;
-      box-sizing:border-box;
-      resize:none;          /* no manual drag handle */
-      overflow:hidden;      /* hide scrollbars */
-      min-height:48px;      /* comfy starting height */
-      line-height:1.4;
+      font-size:1rem; padding:.8rem 1rem; min-width:100%; box-sizing:border-box;
+      resize:none; overflow:hidden; min-height:48px; line-height:1.4;
     }
-    .contact-info{text-align:center;margin-top:1rem;padding-top:1rem;border-top:1px dashed #e1dbd1}
+    .contact-info{text-align:center;margin-top:1rem;padding-top:1rem;border-top:1px dashed var(--border)}
     .contact-info p{margin:.25rem 0}
+
+    /* ===== Realtor (circle headshot) ===== */
+    #agent .card{align-items:center}
+    .realtor-photo{
+      width:168px;height:168px;border-radius:50%;object-fit:cover;
+      border:4px solid var(--border); margin:1rem auto 0;
+    }
+    #agent .body{text-align:center}
+
+    /* Theme toggle button */
+    .theme-toggle{
+      position:fixed; right:16px; bottom:16px; z-index:3800;
+      width:44px; height:44px; border-radius:999px; border:1px solid var(--border);
+      background:var(--surface); color:var(--ink); cursor:pointer;
+      display:grid; place-items:center; font-size:1.15rem;
+      box-shadow:0 6px 18px rgba(0,0,0,.15);
+    }
   </style>
 </head>
 <body>
@@ -166,6 +185,9 @@
     <div class="nav-scrim" hidden></div>
 </header>
 
+<!-- Dark mode toggle -->
+<button class="theme-toggle" type="button" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+
 <main>
     <!-- ===== HERO ===== -->
     <section id="home" class="section">
@@ -173,15 +195,15 @@
             <div class="carousel" role="region" aria-roledescription="carousel" aria-label="Hero images" aria-live="polite">
                 <div class="track" id="heroTrack">
                     <figure class="slide is-active">
-                        <img src="https://tse4.mm.bing.net/th/id/OIP.D93nzsZBdmUayK5Oqlk8lQHaJQ" alt="Modern neutral home exterior" fetchpriority="high" decoding="async">
+                        <img src="images/pixasquare-4ojhpgKpS68-unsplash.jpg" alt="Modern neutral home exterior" fetchpriority="high" decoding="async">
                         <figcaption class="overlay">Find your next chapter in a place you’ll love.</figcaption>
                     </figure>
                     <figure class="slide">
-                        <img src="https://tse4.mm.bing.net/th/id/OIP.KNKT6LYukk7qjVM0HaNNYAHaEc" alt="Luxury homes in neutral tones">
+                        <img src="images/vu-anh-TiVPTYCG_3E-unsplash.jpg" alt="Luxury homes in neutral tones">
                         <figcaption class="overlay">Modern comfort meets understated elegance.</figcaption>
                     </figure>
                     <figure class="slide">
-                        <img src="https://tse1.mm.bing.net/th/id/OIP.f_L0rd8LXQm4_M343hJn8AHaHa" alt="Two-tone house exterior design">
+                        <img src="images/johnson-johnson-U6Q6zVDgmSs-unsplash.jpg" alt="Two-tone house exterior design">
                         <figcaption class="overlay">Quiet streets, welcoming neighborhoods.</figcaption>
                     </figure>
                 </div>
@@ -212,6 +234,19 @@
         </div>
     </section>
 
+    <!-- ===== Realtor ===== -->
+    <section id="agent" class="section">
+        <h2>Meet Your Realtor</h2>
+        <div class="card">
+            <img id="agentPhoto" class="realtor-photo" src="images/realtor.jpg" alt="Realtor headshot">
+            <div class="body">
+                <strong id="agentName">Jane Doe, Realtor®</strong>
+                <p class="muted" id="agentTagline">Neutral Realty Group</p>
+                <p>Friendly, responsive, and detail-obsessed. I help buyers and sellers move with confidence—from first viewing to closing day.</p>
+            </div>
+        </div>
+    </section>
+
     <!-- ===== Gallery ===== -->
     <section id="gallery" class="section" aria-label="Property gallery">
         <div class="meta-row" style="display:flex;flex-wrap:wrap;gap:1rem;align-items:baseline;justify-content:space-between;margin:.5rem 0 1rem">
@@ -224,16 +259,16 @@
         <div class="slider-bg">
             <div class="carousel" role="region" aria-roledescription="carousel" aria-label="Property images" aria-live="polite">
                 <div class="track" id="galleryTrack">
-                    <figure class="slide is-active" data-price="$525,000" data-details="3 Bed • 2 Bath • 1,850 sq ft" data-address="123 Placeholder Ave">
-                        <img src="https://tse1.mm.bing.net/th/id/OIP.0nAsKJO7hnQdJxmtW5xgAwHaHa" alt="Warm home exterior with neutral tones" />
+                    <figure class="slide is-active" data-price="$525,000" data-details="3 Bed • 2 Bath • 1,850 sq ft" data-address="123 Placeholder Ave — Exterior">
+                        <img src="images/webaliser-_TPTXZd9mOo-unsplash.jpg" alt="Home exterior in neutral palette" />
                         <figcaption class="overlay">Warm, sunlit living room with open flow to dining — perfect for hosting or quiet evenings.</figcaption>
                     </figure>
                     <figure class="slide" data-price="$549,000" data-details="3 Bed • 2.5 Bath • 1,980 sq ft" data-address="123 Placeholder Ave — Kitchen">
-                        <img src="https://tse4.mm.bing.net/th/id/OIP.D93nzsZBdmUayK5Oqlk8lQHaJQ" alt="Modern home with light facade" />
+                        <img src="images/abby-rurenko-uOYak90r4L0-unsplash.jpg" alt="Modern kitchen with island" />
                         <figcaption class="overlay">Modern kitchen with ample storage, soft-tone cabinetry, and a spacious prep island.</figcaption>
                     </figure>
-                    <figure class="slide" data-price="$539,000" data-details="3 Bed • 2 Bath • 1,920 sq ft" data-address="123 Placeholder Ave — Primary Suite">
-                        <img src="https://tse4.mm.bing.net/th/id/OIP.KNKT6LYukk7qjVM0HaNNYAHaEc" alt="Primary suite in a modern neutral home" />
+                    <figure class="slide" data-price="$539,000" data-details="3 Bed • 2 Bath • 1,920 sq ft" data-address="123 Placeholder Ave — Living">
+                        <img src="images/ian-keefe-OgcJIKRnRC8-unsplash.jpg" alt="Bright living space" />
                         <figcaption class="overlay">Serene primary suite with generous daylight and room for a cozy reading corner.</figcaption>
                     </figure>
                 </div>
@@ -264,19 +299,21 @@
         <div class="schools" id="schoolsList"></div>
     </section>
 
-  <section id="instagram" class="section">
-  <h2>Latest on Instagram</h2>
-  <div class="card">
-    <!-- LightWidget WIDGET -->
-    <script src="https://cdn.lightwidget.com/widgets/lightwidget.js"></script>
-    <iframe src="//lightwidget.com/widgets/1b364137f91258de89e9a4132d6c700e.html"
-            scrolling="no"
-            allowtransparency="true"
-            class="lightwidget-widget"
-            style="width:100%;border:0;overflow:hidden;">
-    </iframe>
-  </div>
-  </section>
+    <!-- ===== Instagram ===== -->
+    <section id="instagram" class="section">
+        <h2>Latest on Instagram</h2>
+        <div class="card">
+            <!-- LightWidget WIDGET -->
+            <script src="https://cdn.lightwidget.com/widgets/lightwidget.js"></script>
+            <iframe src="//lightwidget.com/widgets/1b364137f91258de89e9a4132d6c700e.html"
+                    scrolling="no"
+                    allowtransparency="true"
+                    class="lightwidget-widget"
+                    style="width:100%;border:0;overflow:hidden;">
+            </iframe>
+        </div>
+    </section>
+
     <!-- ===== Contact ===== -->
     <section id="contact" class="section">
         <h2>Contact</h2>
@@ -332,34 +369,40 @@
 
 <!-- ===== Apply CONFIG early so rest of scripts can use it ===== -->
 <script>
-    (function(){
-      const C = window.CONFIG || {};
+  (function(){
+    const C = window.CONFIG || {};
 
-      // Header brand text
-      const t = document.getElementById('brandTitle');
-      const s = document.getElementById('brandSubtitle');
-      if (t && C.BRAND_TITLE)     t.textContent = C.BRAND_TITLE;
-      if (s && C.BRAND_SUBTITLE)  s.textContent = C.BRAND_SUBTITLE;
+    // Header brand text
+    const t = document.getElementById('brandTitle');
+    const s = document.getElementById('brandSubtitle');
+    if (t && C.BRAND_TITLE)     t.textContent = C.BRAND_TITLE;
+    if (s && C.BRAND_SUBTITLE)  s.textContent = C.BRAND_SUBTITLE;
 
-      // Contact visible info
-      const contactInfo = document.querySelector('#contact .contact-info');
-      if (contactInfo) {
-        contactInfo.innerHTML = `
-          <p><strong>Email:</strong> ${C.EMAIL_VISIBLE || 'agent@example.com'}</p>
-          <p><strong>Phone:</strong> ${C.PHONE_VISIBLE || '(555) 123-4567'}</p>
-        `;
-      }
+    // Also mirror into Agent section if present
+    const an = document.getElementById('agentName');
+    const at = document.getElementById('agentTagline');
+    if (an && C.BRAND_TITLE)    an.textContent = C.BRAND_TITLE;
+    if (at && C.BRAND_SUBTITLE) at.textContent = C.BRAND_SUBTITLE;
 
-      // Contact form endpoint
-      const form = document.getElementById('contactForm');
-      if (form && C.FORM_ENDPOINT) {
-        form.action = C.FORM_ENDPOINT;
-      }
+    // Contact visible info
+    const contactInfo = document.querySelector('#contact .contact-info');
+    if (contactInfo) {
+      contactInfo.innerHTML = `
+        <p><strong>Email:</strong> ${C.EMAIL_VISIBLE || 'agent@example.com'}</p>
+        <p><strong>Phone:</strong> ${C.PHONE_VISIBLE || '(555) 123-4567'}</p>
+      `;
+    }
 
-      // Map center override for Leaflet init
-      window.__MAP_CENTER__ = Array.isArray(C.MAP_CENTER) ? C.MAP_CENTER : null;
-    })();
-  </script>
+    // Contact form endpoint
+    const form = document.getElementById('contactForm');
+    if (form && C.FORM_ENDPOINT) {
+      form.action = C.FORM_ENDPOINT;
+    }
+
+    // Map center override for Leaflet init
+    window.__MAP_CENTER__ = Array.isArray(C.MAP_CENTER) ? C.MAP_CENTER : null;
+  })();
+</script>
 
 <!-- ===== Main scripts ===== -->
 <script>
@@ -442,29 +485,36 @@
     prev:document.querySelector('.gallery-prev'),
     next:document.querySelector('.gallery-next'),
     interval:3000,
-    onChange:(slide)=>{ priceEl.textContent=slide.dataset.price||priceEl.textContent; detailsEl.textContent=slide.dataset.details||detailsEl.textContent; addrEl.textContent=slide.dataset.address||addrEl.textContent; }
+    onChange:(slide)=>{ priceEl.textContent=slide.dataset.price||priceEl.textContent; detailsEl.textContent=slide.dataset.details||detailsEl.textContent; addr
+      onChange:(slide)=>{
+        priceEl.textContent   = slide.dataset.price   || priceEl.textContent;
+        detailsEl.textContent = slide.dataset.details || detailsEl.textContent;
+        addrEl.textContent    = slide.dataset.address || addrEl.textContent;
+      }
   });
 
   /* ===== Random tour videos (placeholders) ===== */
   const TOUR_IDS=['M7lc1UVf-VE','aqz-KE-bpKQ','dQw4w9WgXcQ','kxopViU98Xo','iik25wqIuFo','oHg5SJYRHA0'];
-  function shuffle(arr){
-    const a=[...arr];
-    for(let i=a.length-1;i>0;i--){
-      const j=Math.floor(Math.random()*(i+1));
-      [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
-  }
+  function shuffle(arr){ const a=[...arr]; for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
   const ytThumb=id=>`https://img.youtube.com/vi/${id}/hqdefault.jpg`;
   const ytEmbed=id=>`https://www.youtube-nocookie.com/embed/${id}`;
-  const modal=document.getElementById('videoModal'); const frame=modal.querySelector('iframe'); const closeBtn=modal.querySelector('.modal-close');
+
+  /* Video modal controls */
+  const modal=document.getElementById('videoModal');
+  const frame=modal.querySelector('iframe');
+  const closeBtn=modal.querySelector('.modal-close');
   function openVideo(id){ modal.style.display='flex'; frame.src=ytEmbed(id)+'?autoplay=1'; }
   function closeVideo(){ modal.style.display='none'; frame.src=''; }
-  closeBtn.addEventListener('click', closeVideo); modal.addEventListener('click', e=>{ if(e.target===modal) closeVideo(); }); document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeVideo(); });
+  closeBtn.addEventListener('click', closeVideo);
+  modal.addEventListener('click', e=>{ if(e.target===modal) closeVideo(); });
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeVideo(); });
 
   /* Attach random tours to listing buttons */
   (function(){ const ids=shuffle(TOUR_IDS);
-    document.querySelectorAll('.listing-tour').forEach((btn,idx)=>{ const id=ids[idx%ids.length]; btn.addEventListener('click', ()=>openVideo(id)); });
+    document.querySelectorAll('.listing-tour').forEach((btn,idx)=>{
+      const id=ids[idx%ids.length];
+      btn.addEventListener('click', ()=>openVideo(id));
+    });
   })();
 
   /* Build a random Video Tours grid */
@@ -516,6 +566,34 @@
       list.appendChild(div);
     });
   })();
-  </script>
+
+  /* ===== Dark mode toggle (persist to localStorage) ===== */
+  (function(){
+    const btn = document.getElementById('themeToggle');
+    const KEY = 'theme';
+    const saved = localStorage.getItem(KEY);
+    if(saved==='dark') document.documentElement.setAttribute('data-theme','dark');
+    if(saved==='light') document.documentElement.removeAttribute('data-theme');
+
+    function updateIcon(){
+      const dark = document.documentElement.getAttribute('data-theme')==='dark';
+      btn.textContent = dark ? '☀️' : '🌙';
+      btn.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
+    }
+    updateIcon();
+
+    btn.addEventListener('click', ()=>{
+      const dark = document.documentElement.getAttribute('data-theme')==='dark';
+      if(dark){
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem(KEY,'light');
+      }else{
+        document.documentElement.setAttribute('data-theme','dark');
+        localStorage.setItem(KEY,'dark');
+      }
+      updateIcon();
+    });
+  })();
+</script>
 </body>
 </html>
