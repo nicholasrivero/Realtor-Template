@@ -238,7 +238,7 @@
     <section id="agent" class="section">
         <h2>Meet Your Realtor</h2>
         <div class="card">
-            <img id="agentPhoto" class="realtor-photo" src="images/realtor.jpg" alt="Realtor headshot">
+            <img id="agentPhoto" class="realtor-photo" src="images/realtor.jpg" alt="Realtor headshot" onerror="this.style.display='none'">
             <div class="body">
                 <strong id="agentName">Jane Doe, Realtor®</strong>
                 <p class="muted" id="agentTagline">Neutral Realty Group</p>
@@ -479,18 +479,19 @@
     interval:3000
   });
 
-  /* GALLERY slider (updates meta) */
-  const priceEl=document.getElementById('price'), detailsEl=document.getElementById('details'), addrEl=document.getElementById('addr');
+  /* GALLERY slider (updates meta) — FIXED */
+  const priceEl  = document.getElementById('price');
+  const detailsEl= document.getElementById('details');
+  const addrEl   = document.getElementById('addr');
   makeSlider(document.getElementById('galleryTrack'),{
     prev:document.querySelector('.gallery-prev'),
     next:document.querySelector('.gallery-next'),
     interval:3000,
-    onChange:(slide)=>{ priceEl.textContent=slide.dataset.price||priceEl.textContent; detailsEl.textContent=slide.dataset.details||detailsEl.textContent; addr
-      onChange:(slide)=>{
-        priceEl.textContent   = slide.dataset.price   || priceEl.textContent;
-        detailsEl.textContent = slide.dataset.details || detailsEl.textContent;
-        addrEl.textContent    = slide.dataset.address || addrEl.textContent;
-      }
+    onChange:(slide)=>{
+      if (priceEl  && slide.dataset.price)   priceEl.textContent   = slide.dataset.price;
+      if (detailsEl&& slide.dataset.details) detailsEl.textContent = slide.dataset.details;
+      if (addrEl   && slide.dataset.address) addrEl.textContent    = slide.dataset.address;
+    }
   });
 
   /* ===== Random tour videos (placeholders) ===== */
