@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Realtor Template — Neutral & Modern</title>
+
+    <!-- Leaflet (map) -->
+    <link
+            rel="stylesheet"
+            href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+            integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+            crossorigin=""
+    />
+    <script
+            src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+            crossorigin=""
+    ></script>
+
+    <style>
+  /* ===== Theme (tweak these to tune coloring) ===== */
+  :root{
+    --bg:#f8f5f0;          /* page background */
+    --ink:#2b2a27;         /* main text */
+    --muted:#6e685f;       /* secondary text */
+    --head:#eae3d7;        /* header bg */
+    --accent:#d6c7b0;      /* buttons, highlights & SLIDER FRAME color */
+    --radius:16px;
+    --header-h:96px;       /* used to offset anchor scroll */
+  }
+
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:Inter,system-ui,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6}
+  a{text-decoration:none;color:inherit}
+  img{display:block;max-width:100%;height:auto}
+
+  /* ===== Header ===== */
+  header{
+    position:sticky;top:0;z-index:50;
+    display:flex;justify-content:space-between;align-items:center;
+    padding:1.6rem 2rem;background:var(--head);
+    backdrop-filter:saturate(160%) blur(8px);
+    min-height:var(--header-h);
+  }
+  nav{position:relative;z-index:1;display:flex;gap:1.25rem}
+  nav a{font-weight:600;font-size:1.05rem}
+
+  /* Sections anchor offset */
+  .section{margin-top:2rem; scroll-margin-top:calc(var(--header-h) + 12px);}
+
+  /* ===== Agent face card ===== */
+  .agent-wrap{max-width:1120px;margin:1rem auto 1.5rem;padding:0 1rem}
+  .agent-card{
+    display:grid;grid-template-columns:96px 1fr;gap:1rem;align-items:center;
+    padding:1rem;border-radius:var(--radius);
+    background:#fff;box-shadow:0 8px 28px rgba(0,0,0,.08);
+  }
+  .agent-photo{width:96px;height:96px;border-radius:12px;overflow:hidden;background:#efe8dc;display:grid;place-items:center;color:#6e685f;font-weight:600}
+  .agent-info h3{margin:.1rem 0 .25rem}
+  .agent-meta{color:var(--muted);margin:0 0 .5rem}
+  .agent-actions{display:flex;gap:.5rem;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;justify-content:center;padding:.6rem 1rem;border-radius:10px;border:1px solid #e1dbd1;background:#fff;cursor:pointer}
+  .btn.primary{background:var(--accent);border-color:transparent;color:#fff}
+  @media (max-width:560px){ .agent-card{grid-template-columns:72px 1fr}.agent-photo{width:72px;height:72px} }
+
+  main{max-width:1120px;margin:auto;padding:0 1rem 2rem}
+  .muted{color:var(--muted)}
+
+  /* ===== Full-width SLIDER FRAME uses --accent ===== */
+  .slider-bg{
+    position:relative; left:50%; width:100vw; transform:translateX(-50%);
+    background:var(--accent);
+    padding:0;
+  }
+
+  /* ===== Carousels (no dots), images fill frames ===== */
+  .carousel{
+    position:relative;overflow:hidden;border-radius:var(--radius);
+    margin:0 auto;max-width:1120px;
+  }
+  .track{display:flex;gap:0;margin:0;padding:0;transition:transform .5s ease}
+  .slide{
+    flex:0 0 100%;
+    position:relative;
+    margin:0;
+    aspect-ratio: 16 / 9;
+  }
+  .slide img{
+    position:absolute; inset:0;
+    width:100%; height:100%;
+    object-fit:cover; object-position:center;
+  }
+  @media (max-width:720px){
+    .slide{ aspect-ratio: 4 / 3; }
+  }
+
+  .overlay{
+    position:absolute;left:0;right:0;bottom:0;color:#fff;padding:1rem 1.1rem;
+    background:linear-gradient(180deg,rgba(0,0,0,0) 0%,rgba(0,0,0,.55) 60%,rgba(0,0,0,.8) 100%);
+    opacity:0;transform:translateY(8px);transition:opacity .25s ease,transform .25s ease
+  }
+  .slide.is-active .overlay{opacity:1;transform:translateY(0)}
+
+  .ctrls{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;padding:0 .5rem;pointer-events:none}
+  .ctrl{pointer-events:auto;border:1px solid rgba(255,255,255,.6);background:rgba(0,0,0,.45);color:#fff;width:44px;height:44px;border-radius:999px;display:grid;place-items:center;font-size:1.2rem;cursor:pointer}
+
+  /* ===== Cards / grids ===== */
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.25rem}
+  .card{display:flex;flex-direction:column;border-radius:var(--radius);overflow:hidden;background:#fff;box-shadow:0 8px 28px rgba(0,0,0,.08)}
+  .card .media{background:#efe8dc;display:block;overflow:hidden}
+  .card .media img{width:100%; aspect-ratio:16/9; height:auto; object-fit:cover; display:block}
+  .card .body{padding:1rem;display:grid;gap:.4rem}
+
+  /* Gallery meta row */
+  .meta-row{display:flex;flex-wrap:wrap;gap:1rem;align-items:baseline;justify-content:space-between;margin:.5rem 0 1rem}
+
+  /* ===== About section ===== */
+  .about{display:grid;grid-template-columns:1.1fr .9fr;gap:1.25rem;align-items:center}
+  .about .blurb{background:#fff;border-radius:var(--radius);padding:1.25rem;box-shadow:0 8px 28px rgba(0,0,0,.06)}
+  .about .highlights{display:grid;gap:.6rem}
+  .badge{display:inline-block;background:rgba(0,0,0,.06);padding:.35rem .6rem;border-radius:999px;font-size:.9rem}
+  @media (max-width:860px){ .about{grid-template-columns:1fr} }
+
+  /* ===== Testimonials ===== */
+  .testimonials{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem}
+  .testimonial{background:#fff;border-radius:var(--radius);padding:1rem;box-shadow:0 8px 28px rgba(0,0,0,.06)}
+  .stars{letter-spacing:.15em}
+  .t-name{margin:.5rem 0 0;color:var(--muted);font-size:.95rem}
+
+  /* ===== Map ===== */
+  #mapWrap{border-radius:var(--radius);overflow:hidden;background:#fff;box-shadow:0 8px 28px rgba(0,0,0,.08)}
+  #map{width:100%; height:420px}
+
+  /* ===== Contact ===== */
+  form .row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+  form .row + .row{margin-top:.75rem}
+  form label{display:block;font-weight:600;margin:.25rem 0}
+  form input, form textarea{
+    width:100%;padding:.7rem .8rem;border:1px solid #e1dbd1;border-radius:10px;background:#fff;font:inherit
+  }
+  form textarea{min-height:140px;resize:vertical}
+  form button{margin-top:.9rem}
+  @media (max-width:680px){ form .row{grid-template-columns:1fr} }
+
+  /* Contact card padding */
+  #contact .card{padding:1rem}
+
+  /* Fallback for browsers that ignore aspect-ratio on .slide */
+  @supports not (aspect-ratio: 1 / 1) {
+    .slide { height: clamp(260px, 58vh, 760px); }
+    .slide img { position: static; width: 100%; height: 100%; object-fit: cover; }
+  }
+  @media (max-height: 520px) {
+    .slide { aspect-ratio: auto; height: 58vh; }
+    .slide img { position: static; width: 100%; height: 100%; object-fit: cover; }
+  }
+</style>
+</head>
+<body>
+<header>
+    <div class="agent-brand">
+        <strong style="display:block;font-size:1.15rem;">Jane Doe, Realtor®</strong>
+        <span class="muted" style="display:block;font-size:.95rem;">Neutral Realty Group</span>
+    </div>
+    <nav>
+        <a href="#home">Home</a>
+        <a href="#about">About</a>
+        <a href="#listings">Listings</a>
+        <a href="#gallery">Gallery</a>
+        <a href="#tours">Video Tours</a>
+        <a href="#map-section">Map</a>
+        <a href="#contact">Contact</a>
+    </nav>
+</header>
+
+<!-- Agent face card -->
+<div class="agent-wrap">
+    <div class="agent-card">
+        <div class="agent-photo">Photo</div>
+        <div class="agent-info">
+            <h3>Jane Doe</h3>
+            <p class="agent-meta">Licensed Realtor® · Neutral Realty Group</p>
+            <p class="agent-meta" style="margin-bottom:.75rem">Friendly, detail-oriented guidance for buyers and sellers across Hometown.</p>
+            <div class="agent-actions">
+                <a class="btn primary" href="#contact">Book a Consultation</a>
+                <a class="btn" href="mailto:agent@example.com">Email</a>
+                <a class="btn" href="tel:+1234567890">Call</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<main>
+    <!-- ===== HERO (frame is --accent) ===== -->
+    <section id="home" class="section">
+        <div class="slider-bg">
+            <div class="carousel" role="region" aria-roledescription="carousel" aria-label="Hero images" aria-live="polite">
+                <div class="track" id="heroTrack">
+                    <figure class="slide is-active">
+                        <img src="https://tse4.mm.bing.net/th/id/OIP.D93nzsZBdmUayK5Oqlk8lQHaJQ" alt="Modern neutral home exterior" fetchpriority="high" decoding="async">
+                        <figcaption class="overlay">Find your next chapter in a place you’ll love.</figcaption>
+                    </figure>
+                    <figure class="slide">
+                        <img src="https://tse4.mm.bing.net/th/id/OIP.KNKT6LYukk7qjVM0HaNNYAHaEc" alt="Luxury homes in neutral tones">
+                        <figcaption class="overlay">Modern comfort meets understated elegance.</figcaption>
+                    </figure>
+                    <figure class="slide">
+                        <img src="https://tse1.mm.bing.net/th/id/OIP.f_L0rd8LXQm4_M343hJn8AHaHa" alt="Two-tone house exterior design">
+                        <figcaption class="overlay">Quiet streets, welcoming neighborhoods.</figcaption>
+                    </figure>
+                </div>
+                <div class="ctrls" aria-hidden="true">
+                    <button class="ctrl hero-prev" type="button" aria-label="Previous hero slide">&#10094;</button>
+                    <button class="ctrl hero-next" type="button" aria-label="Next hero slide">&#10095;</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== About the Agent ===== -->
+    <section id="about" class="section">
+        <div class="about">
+            <div class="blurb">
+                <h2>About Jane</h2>
+                <p>With a calm, detail-oriented approach, I help clients buy and sell with confidence—from first-time buyers to seasoned investors. My philosophy is simple: listen carefully, communicate clearly, and negotiate hard on your behalf.</p>
+                <div class="highlights" style="margin-top:.6rem">
+                    <span class="badge">Top 1% Local Sales</span>
+                    <span class="badge">Certified Negotiation Expert</span>
+                    <span class="badge">Staging & Prep Guidance</span>
+                </div>
+            </div>
+            <div class="blurb">
+                <h3>Working With Me</h3>
+                <ul style="margin:.25rem 0 0 1.1rem">
+                    <li>Transparent pricing strategies and market comps</li>
+                    <li>Weekly progress updates during listings</li>
+                    <li>Trusted vendor network (lenders, inspectors, contractors)</li>
+                    <li>Flexible showing schedules and virtual tours</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== Featured listings with random tour lightbox ===== -->
+    <section id="listings" class="section">
+        <h2>Featured Listings</h2>
+        <div class="grid">
+            <article class="card">
+                <div class="media"><img src="https://picsum.photos/seed/house1/800/450" alt="Listing photo placeholder"></div>
+                <div class="body">
+                    <strong>123 Placeholder Ave</strong>
+                    <span class="muted">3 Bed • 2 Bath • 1,850 sq ft</span>
+                    <button class="btn listing-tour">View Video Tour</button>
+                </div>
+            </article>
+            <article class="card">
+                <div class="media"><img src="https://picsum.photos/seed/house2/800/450" alt="Listing photo placeholder"></div>
+                <div class="body">
+                    <strong>456 Example Rd</strong>
+                    <span class="muted">4 Bed • 3 Bath • 2,240 sq ft</span>
+                    <button class="btn listing-tour">View Video Tour</button>
+                </div>
+            </article>
+            <article class="card">
+                <div class="media"><img src="https://picsum.photos/seed/house3/800/450" alt="Listing photo placeholder"></div>
+                <div class="body">
+                    <strong>789 Sample St</strong>
+                    <span class="muted">2 Bed • 2 Bath • 1,320 sq ft</span>
+                    <button class="btn listing-tour">View Video Tour</button>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <!-- ===== Gallery (frame is --accent) ===== -->
+    <section id="gallery" class="section" aria-label="Property gallery">
+        <div class="meta-row">
+            <div>
+                <h2 id="addr">123 Placeholder Ave</h2>
+                <p id="details" class="muted" style="margin:.25rem 0 0">3 Bed • 2 Bath • 1,850 sq ft</p>
+            </div>
+            <strong id="price" style="font-size:1.25rem">$525,000</strong>
+        </div>
+
+        <div class="slider-bg">
+            <div class="carousel" role="region" aria-roledescription="carousel" aria-label="Property images" aria-live="polite">
+                <div class="track" id="galleryTrack">
+                    <figure class="slide is-active"
+                            data-price="$525,000"
+                            data-details="3 Bed • 2 Bath • 1,850 sq ft"
+                            data-address="123 Placeholder Ave">
+                        <img src="https://tse1.mm.bing.net/th/id/OIP.0nAsKJO7hnQdJxmtW5xgAwHaHa" alt="Warm home exterior with neutral tones" />
+                        <figcaption class="overlay">Warm, sunlit living room with open flow to dining — perfect for hosting or quiet evenings.</figcaption>
+                    </figure>
+                    <figure class="slide"
+                            data-price="$549,000"
+                            data-details="3 Bed • 2.5 Bath • 1,980 sq ft"
+                            data-address="123 Placeholder Ave — Kitchen">
+                        <img src="https://tse4.mm.bing.net/th/id/OIP.D93nzsZBdmUayK5Oqlk8lQHaJQ" alt="Modern home with light facade" />
+                        <figcaption class="overlay">Modern kitchen with ample storage, soft-tone cabinetry, and a spacious prep island.</figcaption>
+                    </figure>
+                    <figure class="slide"
+                            data-price="$539,000"
+                            data-details="3 Bed • 2 Bath • 1,920 sq ft"
+                            data-address="123 Placeholder Ave — Primary Suite">
+                        <img src="https://tse4.mm.bing.net/th/id/OIP.KNKT6LYukk7qjVM0HaNNYAHaEc" alt="Primary suite in a modern neutral home" />
+                        <figcaption class="overlay">Serene primary suite with generous daylight and room for a cozy reading corner.</figcaption>
+                    </figure>
+                </div>
+                <div class="ctrls" aria-hidden="true">
+                    <button class="ctrl gallery-prev" type="button" aria-label="Previous photo">&#10094;</button>
+                    <button class="ctrl gallery-next" type="button" aria-label="Next photo">&#10095;</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== Testimonials ===== -->
+    <section id="testimonials" class="section">
+        <h2>Happy Clients</h2>
+        <div class="testimonials">
+            <div class="testimonial">
+                <div class="stars">★★★★★</div>
+                <p>“Jane guided us through every step and got our home sold over asking in one weekend.”</p>
+                <p class="t-name">— A. & M. Robinson</p>
+            </div>
+            <div class="testimonial">
+                <div class="stars">★★★★★</div>
+                <p>“Patient, responsive, and a sharp negotiator. We LOVE our new place.”</p>
+                <p class="t-name">— K. Patel</p>
+            </div>
+            <div class="testimonial">
+                <div class="stars">★★★★★</div>
+                <p>“Professional staging tips + great marketing made all the difference. Highly recommend.”</p>
+                <p class="t-name">— S. Nguyen</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== Random House Tour Videos ===== -->
+    <section id="tours" class="section">
+        <h2>Video Tours</h2>
+        <p class="muted" style="margin-top:-.25rem">A rotating selection of house tour videos (placeholders — swap in your own IDs).</p>
+        <div class="grid" id="tourGrid"></div>
+    </section>
+
+    <!-- ===== Map (Leaflet) ===== -->
+    <section id="map-section" class="section">
+        <h2>Explore On the Map</h2>
+        <div id="mapWrap"><div id="map" role="region" aria-label="Map of listings"></div></div>
+    </section>
+
+    <!-- ===== Contact ===== -->
+    <section id="contact" class="section">
+        <h2>Contact</h2>
+        <div class="card">
+            <form action="https://formspree.io/f/your-form-id" method="POST">
+                <div class="row">
+                    <div>
+                        <label for="name">Name</label>
+                        <input id="name" name="name" type="text" placeholder="Your full name" required>
+                    </div>
+                    <div>
+                        <label for="email">Email</label>
+                        <input id="email" name="_replyto" type="email" placeholder="you@example.com" required>
+                    </div>
+                </div>
+                <div class="row">
+                    <div>
+                        <label for="phone">Phone</label>
+                        <input id="phone" name="phone" type="tel" placeholder="(555) 123-4567">
+                    </div>
+                    <div>
+                        <label for="subject">Subject</label>
+                        <input id="subject" name="subject" type="text" placeholder="Buying, selling, or general question">
+                    </div>
+                </div>
+                <div class="row">
+                    <div style="grid-column:1/-1">
+                        <label for="message">Message</label>
+                        <textarea id="message" name="message" placeholder="Tell me a bit about your goals…" required></textarea>
+                    </div>
+                </div>
+                <button class="btn primary" type="submit">Send Message</button>
+            </form>
+            <p class="muted" style="margin:.75rem 0 0">Prefer email? <a href="mailto:agent@example.com">agent@example.com</a> · Phone: (555) 123-4567</p>
+        </div>
+    </section>
+</main>
+
+<!-- Video modal -->
+<div id="videoModal" role="dialog" aria-label="Video tour" style="position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:100;">
+    <div style="max-width:900px;width:92%;position:relative;background:#000;border-radius:14px;">
+        <button class="modal-close" aria-label="Close video" style="position:absolute;top:8px;right:10px;color:#fff;font-size:1.6rem;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.5);width:38px;height:38px;border-radius:999px;display:grid;place-items:center;cursor:pointer;">&times;</button>
+        <iframe src="" frameborder="0" allow="autoplay; fullscreen" allowfullscreen style="width:100%;height:506px"></iframe>
+    </div>
+</div>
+
+<script>
+/* Reusable slider WITHOUT dots */
+function makeSlider(track, {prev=null,next=null,interval=3000,onChange=null}={}){
+  const slides = Array.from(track.children);
+  let i=0, t=null;
+  function go(n){
+    i=(n+slides.length)%slides.length;
+    track.style.transform=`translateX(-${i*100}%)`;
+    slides.forEach((s,k)=>{
+      s.classList.toggle('is-active',k===i);
+      s.setAttribute('aria-hidden',k===i?'false':'true');
+    });
+    if(onChange) onChange(slides[i], i);
+  }
+  function start(){ stop(); if(interval) t=setInterval(()=>go(i+1), interval); }
+  function stop(){ if(t){clearInterval(t); t=null;} }
+  if(prev) prev.addEventListener('click',()=>{go(i-1);start();});
+  if(next) next.addEventListener('click',()=>{go(i+1);start();});
+  const container = track.parentElement;
+  container.addEventListener('mouseenter', stop);
+  container.addEventListener('mouseleave', start);
+  container.addEventListener('keydown', (e)=>{
+    if(e.key==='ArrowRight'){e.preventDefault();go(i+1);start();}
+    if(e.key==='ArrowLeft'){e.preventDefault();go(i-1);start();}
+  });
+  go(0); start();
+  return {go,start,stop};
+}
+
+/* HERO slider */
+makeSlider(
+  document.getElementById('heroTrack'),
+  {
+    prev: document.querySelector('.hero-prev'),
+    next: document.querySelector('.hero-next'),
+    interval: 3000
+  }
+);
+
+/* GALLERY slider (updates meta) */
+const priceEl   = document.getElementById('price');
+const detailsEl = document.getElementById('details');
+const addrEl    = document.getElementById('addr');
+
+makeSlider(
+  document.getElementById('galleryTrack'),
+  {
+    prev: document.querySelector('.gallery-prev'),
+    next: document.querySelector('.gallery-next'),
+    interval: 3000,
+    onChange:(slide)=>{
+      priceEl.textContent=slide.dataset.price||priceEl.textContent;
+      detailsEl.textContent=slide.dataset.details||detailsEl.textContent;
+      addrEl.textContent=slide.dataset.address||addrEl.textContent;
+    }
+  }
+);
+
+/* ===== Random “house tour” videos (placeholders) ===== */
+const TOUR_IDS = [
+  'M7lc1UVf-VE', 'aqz-KE-bpKQ', 'dQw4w9WgXcQ',
+  'kxopViU98Xo', 'iik25wqIuFo', 'oHg5SJYRHA0'
+];
+function shuffle(arr){ const a=[...arr]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; }
+const ytThumb = id => `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
+const ytEmbed = id => `https://www.youtube-nocookie.com/embed/${id}`;
+
+/* Lightbox */
+const modal=document.getElementById('videoModal');
+const frame=modal.querySelector('iframe');
+const closeBtn=modal.querySelector('.modal-close');
+function openVideo(id){ modal.style.display='flex'; frame.src=ytEmbed(id)+'?autoplay=1'; }
+function closeVideo(){ modal.style.display='none'; frame.src=''; }
+closeBtn.addEventListener('click', closeVideo);
+modal.addEventListener('click', e=>{ if(e.target===modal) closeVideo(); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeVideo(); });
+
+/* Attach random tours to listing buttons */
+(function(){
+  const ids = shuffle(TOUR_IDS);
+  document.querySelectorAll('.listing-tour').forEach((btn, idx)=>{
+    const id = ids[idx % ids.length];
+    btn.addEventListener('click', ()=> openVideo(id));
+  });
+})();
+
+/* Build a random Video Tours grid */
+(function(){
+  const grid = document.getElementById('tourGrid');
+  if(!grid) return;
+  const ids = shuffle(TOUR_IDS).slice(0,6);
+  ids.forEach(id=>{
+    const card = document.createElement('article');
+    card.className = 'card';
+    const media = document.createElement('div');
+    media.className='media';
+    const img = document.createElement('img');
+    img.src = ytThumb(id);
+    img.alt = 'House tour video thumbnail';
+    img.loading = 'lazy';
+    media.appendChild(img);
+
+    const body = document.createElement('div');
+    body.className='body';
+    const title = document.createElement('strong');
+    title.textContent = 'House Tour';
+    const cta = document.createElement('button');
+    cta.className='btn';
+    cta.textContent='Watch Tour';
+    cta.addEventListener('click', ()=> openVideo(id));
+    body.appendChild(title);
+    body.appendChild(cta);
+
+    card.appendChild(media);
+    card.appendChild(body);
+    grid.appendChild(card);
+  });
+})();
+
+/* ===== Map (Leaflet + OpenStreetMap) ===== */
+(function initMap(){
+  const map = L.map('map').setView([29.6516, -82.3248], 12); // Example center (Gainesville, FL)
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; OpenStreetMap'
+  }).addTo(map);
+
+  const listings = [
+    { name:'123 Placeholder Ave', coords:[29.6516, -82.3348], price:'$525k' },
+    { name:'456 Example Rd',     coords:[29.6616, -82.3148], price:'$640k' },
+    { name:'789 Sample St',      coords:[29.6416, -82.3148], price:'$430k' },
+  ];
+
+  listings.forEach(l=>{
+    L.marker(l.coords).addTo(map)
+      .bindPopup(`<strong>${l.name}</strong><br>${l.price}<br><button class="openTour" style="margin-top:.35rem;padding:.3rem .5rem;border:1px solid #ddd;border-radius:6px;background:#fff;cursor:pointer">Watch Tour</button>`)
+      .on('popupopen', (e)=>{
+        const btn = e.popup._contentNode.querySelector('.openTour');
+        if(btn){
+          const id = TOUR_IDS[Math.floor(Math.random()*TOUR_IDS.length)];
+          btn.addEventListener('click', ()=> openVideo(id));
+        }
+      });
+  });
+})();
+</script>
+</body>
+</html>
